@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>乱麻拆解 - 整理思绪</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23455A64' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /><line x1='45' y1='25' x2='10' y2='10' /><line x1='55' y1='25' x2='90' y2='10' /></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23FFD54F'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /></svg>">
+    <style>
+        /* 针对绘画页面的特殊样式 */
+        canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 5;
+            touch-action: none;
+            /* 给线条加一点点柔光感 */
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+        }
+
+        .ui-layer {
+            position: fixed;
+            bottom: 40px;
+            width: 100%;
+            z-index: 100;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hint {
+            color: var(--text-color);
+            opacity: 0.6;
+            font-family: 'ZCOOL KuaiLe', cursive;
+            margin-bottom: 20px;
+        }
+
+        .exit-btn {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--toggle-border);
+            padding: 10px 25px;
+            border-radius: 20px;
+            color: var(--text-color);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        /* 文案覆盖层样式 */
+        #untangleMessageOverlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            z-index: 200;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        #untangleHealingMessage {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 26px;
+            color: var(--text-color);
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .show-message #untangleHealingMessage {
+            opacity: 1;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="toggle-container">
+        <input type="checkbox" id="themeCheckbox">
+        <label for="themeCheckbox" class="toggle-label">
+            <div class="toggle-slider"><span class="icon" id="themeIcon">🌙</span></div>
+        </label>
+    </div>
+
+    <div id="particles"></div>
+
+    <canvas id="untangleCanvas"></canvas>
+
+    <div id="untangleMessageOverlay" class="hidden">
+        <p id="untangleHealingMessage"></p>
+    </div>
+
+    <div class="ui-layer">
+        <p class="hint">抚平乱麻，把纠结的一一梳理</p>
+        <button class="exit-btn" onclick="location.href='menu.html'">回到中心</button>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        const untangleCanvas = document.getElementById('untangleCanvas');
+        const untangleCtx = untangleCanvas.getContext('2d');
+        let lines = [];
+        let isMessageShown = false;
+
+        // 专属疗愈文案
+        const untangleQuotes = [
+            "看，梳理干净后的世界，其实很温柔。",
+            "The mess is gone, leaving only peace behind.",
+            "那些纠结的念头，最终都会化作平静的呼吸。",
+            "Everything is clear now. You are doing great.",
+            "心里干净了，好梦才会住进来。",
+            "Slow down, your soul needs to catch up.",
+            "抚平了乱麻，也抚平了不安的自己。",
+            "The clarity you seek is already within you.",
+            "乱麻散去，你依然闪闪发光。",
+            "Peace is not the absence of trouble, but the presence of calm."
+        ];
+
+        function resizeUntangle() {
+            untangleCanvas.width = window.innerWidth;
+            untangleCanvas.height = window.innerHeight;
+            initLines();
+        }
+
+        function initLines() {
+            lines = [];
+            isMessageShown = false;
+            const lineCount = 18; // 线条数量
+            
+            for (let i = 0; i < lineCount; i++) {
+                const x1 = Math.random() * untangleCanvas.width;
+                const y1 = Math.random() * untangleCanvas.height;
+                const x2 = Math.random() * untangleCanvas.width;
+                const y2 = Math.random() * untangleCanvas.height;
+
+                lines.push({
+                    x1: x1, y1: y1,
+                    x2: x2, y2: y2,
+                    // 初始随机控制点 (乱麻状态)
+                    cp1x: Math.random() * untangleCanvas.width,
+                    cp1y: Math.random() * untangleCanvas.height,
+                    cp2x: Math.random() * untangleCanvas.width,
+                    cp2y: Math.random() * untangleCanvas.height,
+                    // 目标直线上的控制点 (Lerp 目标)
+                    targetCp1x: x1 + (x2 - x1) * 0.33,
+                    targetCp1y: y1 + (y2 - y1) * 0.33,
+                    targetCp2x: x1 + (x2 - x1) * 0.66,
+                    targetCp2y: y1 + (y2 - y1) * 0.66,
+                    
+                    opacity: 0.5,
+                    progress: 0,      // 0 = 乱, 1 = 直
+                    isUntangled: false
+                });
+            }
+        }
+
+        function drawUntangle() {
+            untangleCtx.clearRect(0, 0, untangleCanvas.width, untangleCanvas.height);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            
+            untangleCtx.strokeStyle = isDark ? 'rgba(255, 255, 255, 1)' : 'rgba(69, 90, 100, 1)';
+            untangleCtx.lineWidth = 3;
+            untangleCtx.lineCap = 'round';
+
+            let allGone = true;
+
+            lines.forEach((line) => {
+                if (line.opacity > 0) {
+                    allGone = false;
+
+                    // 缓慢变直的过程
+                    if (line.isUntangled && line.progress < 1) {
+                        line.progress += 0.012; // 调整这个值改变“梳理”的顺滑速度
+                    }
+
+                    // 变直后期开始渐隐
+                    if (line.progress >= 0.8) {
+                        line.opacity -= 0.008; 
+                    }
+
+                    // 插值计算当前控制点位置
+                    const currCp1x = line.cp1x + (line.targetCp1x - line.cp1x) * line.progress;
+                    const currCp1y = line.cp1y + (line.targetCp1y - line.cp1y) * line.progress;
+                    const currCp2x = line.cp2x + (line.targetCp2x - line.cp2x) * line.progress;
+                    const currCp2y = line.cp2y + (line.targetCp2y - line.cp2y) * line.progress;
+
+                    untangleCtx.beginPath();
+                    untangleCtx.globalAlpha = line.opacity;
+                    untangleCtx.moveTo(line.x1, line.y1);
+                    untangleCtx.bezierCurveTo(currCp1x, currCp1y, currCp2x, currCp2y, line.x2, line.y2);
+                    untangleCtx.stroke();
+                }
+            });
+
+            if (allGone && !isMessageShown && lines.length > 0) {
+                showFinalMessage();
+            }
+            
+            requestAnimationFrame(drawUntangle);
+        }
+
+        // 交互检测
+        untangleCanvas.addEventListener('pointermove', (e) => {
+            const mx = e.clientX;
+            const my = e.clientY;
+
+            lines.forEach(line => {
+                const d1 = Math.sqrt((mx - line.cp1x)**2 + (my - line.cp1y)**2);
+                const d2 = Math.sqrt((mx - line.cp2x)**2 + (my - line.cp2y)**2);
+                if (d1 < 70 || d2 < 70) {
+                    line.isUntangled = true;
+                }
+            });
+        });
+
+        function showFinalMessage() {
+            isMessageShown = true;
+            const msgOverlay = document.getElementById('untangleMessageOverlay');
+            const msgText = document.getElementById('untangleHealingMessage');
+            
+            msgText.innerText = untangleQuotes[Math.floor(Math.random() * untangleQuotes.length)];
+            msgOverlay.classList.remove('hidden');
+            
+            setTimeout(() => {
+                msgOverlay.classList.add('show-message');
+            }, 1000);
+        }
+
+        window.addEventListener('resize', resizeUntangle);
+        resizeUntangle();
+        drawUntangle();
+    </script>
+</body>
+</html>
