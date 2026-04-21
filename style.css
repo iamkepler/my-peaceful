@@ -1,8 +1,5 @@
-/* ============================================================
-   1. 核心变量 (Design Tokens)
-   ============================================================ */
 :root {
-    /* Light Mode - 温暖与包容 */
+    /* Light Mode */
     --bg-top: #E3F2FD;
     --bg-mid: #FFFDE7;
     --bg-bot: #FFF9C4;
@@ -20,7 +17,7 @@
 }
 
 [data-theme="dark"] {
-    /* Dark Mode - 深邃与守护 */
+    /* Dark Mode */
     --bg-top: #1A2639;
     --bg-mid: #2A3B4C;
     --bg-bot: #1F2933;
@@ -34,9 +31,6 @@
     --glass-bg: rgba(255, 255, 255, 0.05);
 }
 
-/* ============================================================
-   2. 基础布局与复位
-   ============================================================ */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -59,9 +53,6 @@ body {
     position: relative;
 }
 
-/* ============================================================
-   3. 通用组件 (Toggle, Particles, Star)
-   ============================================================ */
 .toggle-container {
     position: absolute;
     top: 40px;
@@ -103,7 +94,6 @@ body {
     transform: translateX(34px);
 }
 
-/* 背景粒子 */
 #particles {
     position: fixed;
     top: 0;
@@ -131,9 +121,7 @@ body {
     100% { transform: translateY(-180px) scale(1.1) rotate(25deg); opacity: 0; }
 }
 
-/* ============================================================
-   4. Landing Page 专属 (屿你，共赴晨昏)
-   ============================================================ */
+/* Landing Page */
 .content-wrapper {
     position: relative;
     z-index: 10;
@@ -218,9 +206,7 @@ h1 {
     box-shadow: 0 10px 25px var(--btn-shadow);
 }
 
-/* ============================================================
-   5. Menu Page 专属 (放松中心)
-   ============================================================ */
+/* Menu Page */
 .menu-page .content-wrapper {
     justify-content: flex-start;
     padding-top: 10vh;
@@ -256,7 +242,7 @@ h1 {
     transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.4s ease;
 }
 
-/* 电脑端 Hover */
+/* PC Hover */
 @media (hover: hover) {
     .menu-card:hover {
         transform: scale(1.08) translateY(-5px);
@@ -265,7 +251,7 @@ h1 {
     }
 }
 
-/* 手机端点击 */
+/* Mobile Click */
 .menu-card:active {
     transform: scale(0.93);
     transition: transform 0.15s ease;

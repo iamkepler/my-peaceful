@@ -62,8 +62,8 @@
     <canvas id="zenCanvas"></canvas>
 
     <div class="canvas-ui">
-        <p class="canvas-hint">随心划动，看繁星闪烁</p>
-        <button class="exit-canvas-btn" onclick="location.href='menu.html'">退出练习</button>
+        <p class="canvas-hint">踏出第一步，惊喜就来了</p>
+        <button class="exit-canvas-btn" onclick="location.href='menu.html'">自信点满了</button>
     </div>
 
     <script src="script.js"></script>
@@ -71,28 +71,27 @@
         const canvas = document.getElementById('zenCanvas');
         const ctx = canvas.getContext('2d');
         let points = [];
-        let particles = []; // 新增粒子数组
+        let particles = []; 
 
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
 
-        // 闪光点类
         class Sparkle {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
                 this.size = Math.random() * 3 + 1;
                 this.opacity = 1;
-                this.vx = (Math.random() - 0.5) * 1; // 轻微漂移
+                this.vx = (Math.random() - 0.5) * 1; 
                 this.vy = (Math.random() - 0.5) * 1;
                 this.life = 1.0;
             }
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.life -= 0.015; // 消失速度
+                this.life -= 0.015;
                 this.opacity = this.life;
             }
             draw(isDark) {
@@ -101,7 +100,6 @@
                 ctx.globalAlpha = this.opacity;
                 ctx.fillStyle = isDark ? '#FFFDE7' : '#FFD54F';
                 ctx.fill();
-                // 增加外发光感
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = isDark ? 'rgba(255, 213, 79, 0.8)' : 'rgba(255, 213, 79, 0.4)';
             }
@@ -111,7 +109,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-            // 更新并绘制闪光点
             for (let i = particles.length - 1; i >= 0; i--) {
                 particles[i].update();
                 if (particles[i].life <= 0) {
@@ -123,12 +120,10 @@
             requestAnimationFrame(draw);
         }
 
-        // 交互逻辑
         function handleMove(e) {
             const x = e.clientX || e.touches[0].clientX;
             const y = e.clientY || e.touches[0].clientY;
             
-            // 每次移动产生2-3个小闪光点
             for (let i = 0; i < 3; i++) {
                 particles.push(new Sparkle(x + (Math.random()-0.5)*10, y + (Math.random()-0.5)*10));
             }

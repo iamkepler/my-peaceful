@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>呼吸节拍 - 平复心跳</title>
+    <title>节奏大师 Show Time</title>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
     <link rel="stylesheet" href="style.css">
@@ -20,7 +20,6 @@
             z-index: 10;
         }
 
-        /* 呼吸圆圈的基础样式 */
         .breathe-circle {
             width: 150px;
             height: 150px;
@@ -28,11 +27,9 @@
             background: var(--star-core);
             box-shadow: 0 0 30px var(--star-glow-inner), 0 0 60px var(--star-glow-outer);
             position: relative;
-            /* 确保缩放平滑 */
             transition: transform 0.1s linear; 
         }
 
-        /* 外部扩散的水波纹 */
         .breathe-circle::after {
             content: '';
             position: absolute;
@@ -58,7 +55,6 @@
             font-family: 'ZCOOL KuaiLe', cursive;
         }
 
-        /* === 统一的 UI 按钮层样式 === */
         .ui-layer {
             position: fixed;
             bottom: 40px;
@@ -117,9 +113,6 @@
         const instruction = document.getElementById('instruction');
         const timerHint = document.getElementById('timerHint');
 
-        /**
-         * 呼吸节拍逻辑 (4-7-8 呼吸法)
-         */
         const stages = [
             { text: "用力吸...", duration: 4000, scale: 1.8, hint: "Inhale" },
             { text: "憋着...", duration: 7000, scale: 1.8, hint: "Hold" },
