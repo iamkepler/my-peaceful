@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ENFJの主场</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23455A64' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /><line x1='45' y1='25' x2='10' y2='10' /><line x1='55' y1='25' x2='90' y2='10' /></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23FFD54F'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /></svg>">
+    <style>
+        canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 5;
+            touch-action: none;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+        }
+
+        .ui-layer {
+            position: fixed;
+            bottom: 40px;
+            width: 100%;
+            z-index: 100;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hint {
+            color: var(--text-color);
+            opacity: 0.6;
+            font-family: 'ZCOOL KuaiLe', cursive;
+            margin-bottom: 20px;
+        }
+
+        .exit-btn {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--toggle-border);
+            padding: 10px 25px;
+            border-radius: 20px;
+            color: var(--text-color);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        #untangleMessageOverlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            z-index: 200;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        #untangleHealingMessage {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 26px;
+            color: var(--text-color);
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .show-message #untangleHealingMessage {
+            opacity: 1;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="side-controls">
+        <div class="toggle-container">
+            <input type="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="toggle-label">
+                <div class="toggle-slider">
+                    <span class="icon" id="themeIcon">🌙</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="volume-container">
+            <button id="muteBtn" class="volume-btn">🔊</button>
+        </div>
+    </div>
+
+    <div id="particles"></div>
+
+    <canvas id="untangleCanvas"></canvas>
+
+    <div id="untangleMessageOverlay" class="hidden">
+        <p id="untangleHealingMessage"></p>
+    </div>
+
+    <div class="ui-layer">
+        <p class="hint">抚平乱麻，把纠结的一一梳理</p>
+        <button class="exit-btn" onclick="location.href='menu.html'">Back to Main Menu</button>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        const untangleCanvas = document.getElementById('untangleCanvas');
+        const untangleCtx = untangleCanvas.getContext('2d');
+        let lines = [];
+        let isMessageShown = false;
+
+        const untangleQuotes = [
+            "看，梳理干净后的世界，其实很温柔。",
+            "The mess is gone, leaving only peace behind.",
+            "那些纠结的念头，最终都会化作平静的呼吸。",
+            "Everything is clear now. You are doing great.",
+            "心里干净了，好梦才会住进来。",
+            "Slow down, your soul needs to catch up.",
+            "抚平了乱麻，也抚平了不安的自己。",
+            "The clarity you seek is already within you.",
+            "乱麻散去，你依然闪闪发光。",
+            "Peace is not the absence of trouble, but the presence of calm."
+        ];
+
+        function resizeUntangle() {
+            untangleCanvas.width = window.innerWidth;
+            untangleCanvas.height = window.innerHeight;
+            initLines();
+        }
+
+        function initLines() {
+            lines = [];
+            isMessageShown = false;
+            const lineCount = 18;
+            
+            for (let i = 0; i < lineCount; i++) {
+                const x1 = Math.random() * untangleCanvas.width;
+                const y1 = Math.random() * untangleCanvas.height;
+                const x2 = Math.random() * untangleCanvas.width;
+                const y2 = Math.random() * untangleCanvas.height;
+
+                lines.push({
+                    x1: x1, y1: y1,
+                    x2: x2, y2: y2,
+                    cp1x: Math.random() * untangleCanvas.width,
+                    cp1y: Math.random() * untangleCanvas.height,
+                    cp2x: Math.random() * untangleCanvas.width,
+                    cp2y: Math.random() * untangleCanvas.height,
+                    targetCp1x: x1 + (x2 - x1) * 0.33,
+                    targetCp1y: y1 + (y2 - y1) * 0.33,
+                    targetCp2x: x1 + (x2 - x1) * 0.66,
+                    targetCp2y: y1 + (y2 - y1) * 0.66,
+                    opacity: 0.5,
+                    progress: 0,     
+                    isUntangled: false
+                });
+            }
+        }
+
+        function getBezierPoint(t, p0, p1, p2, p3) {
+            const cx = 3 * (p1.x - p0.x);
+            const bx = 3 * (p2.x - p1.x) - cx;
+            const ax = p3.x - p0.x - cx - bx;
+            const cy = 3 * (p1.y - p0.y);
+            const by = 3 * (p2.y - p1.y) - cy;
+            const ay = p3.y - p0.y - cy - by;
+            const x = (ax * Math.pow(t, 3)) + (bx * Math.pow(t, 2)) + (cx * t) + p0.x;
+            const y = (ay * Math.pow(t, 3)) + (by * Math.pow(t, 2)) + (cy * t) + p0.y;
+            return { x, y };
+        }
+
+        function drawUntangle() {
+            untangleCtx.clearRect(0, 0, untangleCanvas.width, untangleCanvas.height);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            
+            untangleCtx.strokeStyle = isDark ? 'rgba(255, 255, 255, 1)' : 'rgba(69, 90, 100, 1)';
+            untangleCtx.lineWidth = 4; 
+            untangleCtx.lineCap = 'round';
+
+            let allGone = true;
+
+            lines.forEach((line) => {
+                if (line.opacity > 0) {
+                    allGone = false;
+
+                    if (line.isUntangled && line.progress < 1) {
+                        line.progress += 0.02; 
+                    }
+
+                    if (line.progress >= 0.8) {
+                        line.opacity -= 0.01; 
+                    }
+
+                    const currCp1x = line.cp1x + (line.targetCp1x - line.cp1x) * line.progress;
+                    const currCp1y = line.cp1y + (line.targetCp1y - line.cp1y) * line.progress;
+                    const currCp2x = line.cp2x + (line.targetCp2x - line.cp2x) * line.progress;
+                    const currCp2y = line.cp2y + (line.targetCp2y - line.cp2y) * line.progress;
+
+                    untangleCtx.beginPath();
+                    untangleCtx.globalAlpha = line.opacity;
+                    untangleCtx.moveTo(line.x1, line.y1);
+                    untangleCtx.bezierCurveTo(currCp1x, currCp1y, currCp2x, currCp2y, line.x2, line.y2);
+                    untangleCtx.stroke();
+                }
+            });
+
+            if (allGone && !isMessageShown && lines.length > 0) {
+                showFinalMessage();
+            }
+            
+            requestAnimationFrame(drawUntangle);
+        }
+
+        untangleCanvas.addEventListener('pointermove', (e) => {
+            if (isMessageShown) return;
+
+            const mx = e.clientX;
+            const my = e.clientY;
+
+            lines.forEach(line => {
+                if (line.isUntangled) return;
+
+                for (let t = 0; t <= 1; t += 0.1) {
+                    const pt = getBezierPoint(t, 
+                        {x: line.x1, y: line.y1}, 
+                        {x: line.cp1x, y: line.cp1y}, 
+                        {x: line.cp2x, y: line.cp2y}, 
+                        {x: line.x2, y: line.y2}
+                    );
+                    
+                    const dist = Math.sqrt((mx - pt.x)**2 + (my - pt.y)**2);
+                    if (dist < 40) { 
+                        line.isUntangled = true;
+                        break; 
+                    }
+                }
+            });
+        });
+
+        function showFinalMessage() {
+            isMessageShown = true;
+            const msgOverlay = document.getElementById('untangleMessageOverlay');
+            const msgText = document.getElementById('untangleHealingMessage');
+            
+            msgText.innerText = untangleQuotes[Math.floor(Math.random() * untangleQuotes.length)];
+            msgOverlay.classList.remove('hidden');
+            
+            setTimeout(() => {
+                msgOverlay.classList.add('show-message');
+            }, 500);
+        }
+
+        window.addEventListener('resize', resizeUntangle);
+        resizeUntangle();
+        drawUntangle();
+    </script>
+</body>
+</html>

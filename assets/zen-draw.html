@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Little stars like U</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23455A64' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /><line x1='45' y1='25' x2='10' y2='10' /><line x1='55' y1='25' x2='90' y2='10' /></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23FFD54F'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /></svg>">
+    <style>
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            touch-action: none;
+        }
+        .canvas-ui {
+            position: fixed;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .canvas-hint {
+            color: var(--text-color);
+            opacity: 0.6;
+            font-family: 'ZCOOL KuaiLe', cursive; 
+            font-size: 18px; 
+            margin-bottom: 20px;
+        }
+        .exit-canvas-btn {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--toggle-border);
+            padding: 10px 25px;
+            border-radius: 20px;
+            color: var(--text-color);
+            cursor: pointer;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgMusic" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="side-controls">
+        <div class="toggle-container">
+            <input type="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="toggle-label">
+                <div class="toggle-slider">
+                    <span class="icon" id="themeIcon">🌙</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="volume-container">
+            <button id="muteBtn" class="volume-btn">🔊</button>
+        </div>
+    </div>
+
+    <div id="particles"></div>
+
+    <canvas id="zenCanvas"></canvas>
+
+    <div class="canvas-ui">
+        <p class="canvas-hint">随心划动，看繁星闪烁</p>
+        <button class="exit-canvas-btn" onclick="location.href='menu.html'">Back to Main Menu</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const canvas = document.getElementById('zenCanvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        let particles = []; 
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Sparkle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 3 + 1;
+                this.opacity = 1;
+                this.vx = (Math.random() - 0.5) * 1; 
+                this.vy = (Math.random() - 0.5) * 1;
+                this.life = 1.0;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.015;
+                this.opacity = this.life;
+            }
+            draw(isDark) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = isDark ? '#FFFDE7' : '#FFD54F';
+                ctx.fill();
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = isDark ? 'rgba(255, 213, 79, 0.8)' : 'rgba(255, 213, 79, 0.4)';
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                } else {
+                    particles[i].draw(isDark);
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+
+        function handleMove(e) {
+            const x = e.clientX || e.touches[0].clientX;
+            const y = e.clientY || e.touches[0].clientY;
+            
+            for (let i = 0; i < 3; i++) {
+                particles.push(new Sparkle(x + (Math.random()-0.5)*10, y + (Math.random()-0.5)*10));
+            }
+        }
+
+        canvas.addEventListener('pointermove', handleMove);
+        window.addEventListener('resize', resize);
+        resize();
+        draw();
+    </script>
+</body>
+</html>

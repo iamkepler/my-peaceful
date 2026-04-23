@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>屿你</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23455A64' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /><line x1='45' y1='25' x2='10' y2='10' /><line x1='55' y1='25' x2='90' y2='10' /></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23FFD54F'><path d='M35 90 L65 90 L60 30 L40 30 Z' /><path d='M40 30 L60 30 L55 20 L45 20 Z' /></svg>">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <audio id="bgMusic" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="side-controls">
+        <div class="toggle-container">
+            <input type="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="toggle-label">
+                <div class="toggle-slider">
+                    <span class="icon" id="themeIcon">🌙</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="volume-container">
+            <button id="muteBtn" class="volume-btn">🔊</button>
+        </div>
+    </div>
+
+    <div id="particles"></div>
+
+    <main class="content-wrapper" id="mainContent">
+        <div class="star-container">
+            <div class="star-orb"></div>
+        </div>
+        
+        <h1 id="mainTitle">在这里，你不需要完美</h1>
+        <p class="subtitle" id="mainSubtitle">跟着光晕，深呼吸</p>
+
+        <div class="worry-input-container" id="worryInputContainer">
+            <textarea id="worryInput" placeholder="What's bothering you..." maxlength="500"></textarea>
+        </div>
+        
+        <button class="enter-btn" id="enterBtn">把烦恼留在门外</button>
+    </main>
+
+    <div id="messageOverlay" class="hidden">
+        <p id="healingMessage"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

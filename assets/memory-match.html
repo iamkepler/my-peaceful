@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pug 记忆翻牌 - 屿你</title>
+    <link rel="stylesheet" href="style.css">
+<style>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(to bottom, var(--bg-top), var(--bg-mid), var(--bg-bot));
+        font-family: 'ZCOOL KuaiLe', cursive;
+    }
+
+    .game-container {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(70px, 120px)); 
+        gap: 15px;
+        justify-content: center; 
+        max-width: 600px; 
+        margin: 100px auto 20px;
+        /* 增加视距，让 3D 效果更明显 */
+        perspective: 1200px; 
+    }
+
+    .card {
+        aspect-ratio: 1/1;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    /* 翻转动画 */
+    .card.flipped { 
+        transform: rotateY(180deg); 
+    }
+
+    .card-face {
+        position: absolute;
+        width: 100%; 
+        height: 100%;
+        /* 强制隐藏背面 */
+        backface-visibility: hidden !important;
+        -webkit-backface-visibility: hidden !important;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--toggle-border);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* 卡牌背面 (盖子层) */
+    .card-back {
+        background: var(--btn-bg);
+        font-size: 2rem;
+        /* 放在 Z 轴最前方 */
+        transform: translateZ(1px); 
+        z-index: 2;
+    }
+
+    /* 卡牌正面 (照片层) */
+    .card-front {
+        background: var(--toggle-bg);
+        /* 关键：先旋转 180 度，并往 Z 轴后方推一点点 */
+        transform: rotateY(180deg) translateZ(1px); 
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .card-front img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* 防止图片溢出导致边缘发虚 */
+        display: block;
+    }
+
+    .stats {
+        text-align: center;
+        color: var(--text-color);
+        margin-top: 20px;
+    }
+
+    .exit-btn {
+        padding: 10px 25px;
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        /* 模态框背景遮罩 */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        transition: opacity 0.3s ease;
+    }
+
+    /* 对话框主体 */
+    .modal-content {
+        background: var(--bg-top);
+        padding: 40px;
+        border-radius: 30px;
+        text-align: center;
+        border: 2px solid var(--toggle-border);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        max-width: 90%;
+        width: 400px;
+    }
+
+    .modal-content h2 {
+        font-family: 'ZCOOL KuaiLe', cursive;
+        color: var(--text-color);
+        margin-bottom: 15px;
+    }
+
+    .modal-content p {
+        color: var(--text-color);
+        opacity: 0.8;
+        margin-bottom: 30px;
+    }
+
+    /* 按钮布局 */
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .modal-btn {
+        padding: 12px 25px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        font-family: 'ZCOOL KuaiLe', cursive;
+        font-size: 16px;
+        transition: transform 0.2s;
+    }
+
+    .modal-btn:active { transform: scale(0.95); }
+
+    .modal-btn.primary {
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        box-shadow: 0 4px 15px var(--btn-shadow);
+    }
+
+    .modal-btn.secondary {
+        background: var(--toggle-bg);
+        color: var(--text-color);
+        border: 1px solid var(--toggle-border);
+    }
+
+</style>
+</head>
+
+<body>
+    <div class="side-controls">
+        <div class="toggle-container">
+            <input type="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="toggle-label">
+                <div class="toggle-slider"><span class="icon" id="themeIcon">🌙</span></div>
+            </label>
+        </div>
+        <div class="volume-container">
+            <button id="muteBtn" class="volume-btn">🔊</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop><source src="assets/bg-music.mp3" type="audio/mpeg"></audio>
+
+    <div class="stats">
+        <h2>Pug 搜集计划</h2>
+        <p>尝试次数: <span id="movesCount">0</span></p>
+    </div>
+
+    <div class="game-container" id="gameGrid"></div>
+
+    <div style="text-align:center; margin-bottom: 50px;">
+        <button class="exit-btn" onclick="location.href='menu.html'">Back to Main Menu</button>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        // 1. 定义多主题库
+        const themes = {
+            bb: {
+                prefix: 'SpongeBob Friend',
+                ext: 'png',
+                count: 8,
+                folder: 'assets/bb/',
+                title: 'Finding Nemo'
+            },
+            beer: {
+                prefix: 'Beer',
+                ext: 'png',
+                count: 8,
+                folder: 'assets/beer/',
+                title: 'Give it a Shot'
+            },
+            car: {
+                prefix: 'Car',
+                ext: 'png',
+                count: 8,
+                folder: 'assets/car/',
+                title: 'Vroom Vroom...'
+            },
+            pipi: {
+                prefix: 'PiPi',
+                ext: 'png',
+                count: 8,
+                folder: 'assets/pipi/',
+                title: 'Where is PiPiiiii'
+            }
+        };
+
+        // 2. 全局变量
+        const grid = document.getElementById('gameGrid');
+        const movesDisplay = document.getElementById('movesCount');
+        let currentTheme = null;
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+
+        // 3. 游戏初始化函数
+        function initGame() {
+            // A. 随机选取主题
+            const keys = Object.keys(themes);
+            const randomKey = keys[Math.floor(Math.random() * keys.length)];
+            currentTheme = themes[randomKey];
+
+            // B. 更新 UI 标题
+            const titleEl = document.querySelector('.stats h2');
+            if (titleEl) titleEl.innerText = currentTheme.title;
+
+            // C. 生成该主题的图片池
+            let themeImages = [];
+            for (let i = 1; i <= currentTheme.count; i++) {
+                themeImages.push(`${currentTheme.folder}${currentTheme.prefix}${i}.${currentTheme.ext}`);
+            }
+
+            // D. 准备卡牌阵列 (双倍并打乱)
+            let cardArray = [...themeImages, ...themeImages];
+            cardArray.sort(() => Math.random() - 0.5);
+
+            // E. 渲染棋盘
+            renderBoard(cardArray);
+        }
+
+        // 4. 渲染棋盘函数
+        function renderBoard(array) {
+            grid.innerHTML = ''; // 清空旧卡牌
+            matchedPairs = 0;
+            moves = 0;
+            movesDisplay.innerText = moves;
+            flippedCards = [];
+
+            array.forEach((imgSrc) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.img = imgSrc;
+                card.innerHTML = `
+                    <div class="card-face card-back">🐾</div>
+                    <div class="card-face card-front">
+                        <img src="${imgSrc}" alt="game-item">
+                    </div>
+                `;
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+            });
+        }
+
+        // 5. 翻牌逻辑
+        function flipCard() {
+            // 防止：点击已翻开的牌、在动画期间点击第三张牌
+            if (flippedCards.length < 2 && !this.classList.contains('flipped')) {
+                this.classList.add('flipped');
+                flippedCards.push(this);
+
+                if (flippedCards.length === 2) {
+                    moves++;
+                    movesDisplay.innerText = moves;
+                    checkMatch();
+                }
+            }
+        }
+
+        // 修改 checkMatch 中的成功逻辑
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.img === card2.dataset.img) {
+                matchedPairs++;
+                flippedCards = [];
+                
+                if (matchedPairs === currentTheme.count) {
+                    setTimeout(() => {
+                        showGameModal(); // 调用自定义对话框
+                    }, 500);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        // 显示对话框
+        function showGameModal() {
+            const modal = document.getElementById('gameModal');
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerText = `你在 ${moves} 步内找齐了所有的 ${currentTheme.prefix}！`;
+            modal.classList.remove('hidden');
+        }
+
+        // 再玩一局逻辑
+        function closeModalAndRestart() {
+            document.getElementById('gameModal').classList.add('hidden');
+            initGame(); // 重新开始并随机换主题
+        }
+
+        // 7. 启动游戏
+        initGame();
+    </script>
+
+    <div id="gameModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="modalTitle">🎉 Weeeeeeeee</h2>
+            <p id="modalBody">看来你的脑还是很好的嘛</p>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="location.href='menu.html'">Back to Main Menu</button>
+                <button class="modal-btn primary" onclick="closeModalAndRestart()">Again?</button>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
