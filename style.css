@@ -324,24 +324,69 @@ h1 {
     .menu-grid { grid-template-columns: repeat(3, 1fr); max-width: 1000px; }
 }
 
-/* Ending */
-.dream-fade-out {
-    filter: blur(15px) !important;
-    opacity: 0 !important;
-    transform: scale(1.1);
-    transition: filter 2.5s ease, opacity 2.5s ease, transform 2.5s ease !important;
-    pointer-events: none;
-}
+
 
 #messageOverlay {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* 1. 背景颜色：稍微深一点的半透明黑，衬托白色文字 */
+    background-color: rgba(0, 0, 0, 0.5); 
+    
+    /* 2. 核心：只模糊这层“玻璃”背后的东西，文字保持清晰 */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    
+    /* 3. 布局 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    
+    /* 4. 动画状态 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.2s ease;
+}
+
+/* 激活状态：当 JS 加入 .fade-in 时 */
+#messageOverlay.fade-in {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 5. 确保文字绝对清晰 */
+#healingMessage {
+    font-size: 3.5rem;
+    color: #FFFFFF !important; /* 强制纯白 */
+    font-family: 'ZCOOL KuaiLe', cursive;
     text-align: center;
-    pointer-events: none;
+    
+    /* 移除所有可能继承的模糊滤镜 */
+    filter: none !important; 
+    
+    /* 增加文字阴影，让它在模糊背景上更显眼 */
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    
+    /* 升起动画 */
+    transform: translateY(20px);
+    transition: transform 1.2s ease;
+}
+
+#healingMessage {
+    font-size: 2.5rem;
+    color: white;
+    font-family: 'ZCOOL KuaiLe', cursive;
+    text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    transform: translateY(20px);
+    transition: transform 1.5s ease;
+}
+
+#messageOverlay.fade-in #healingMessage {
+    transform: translateY(0); 
 }
 
 #healingMessage {

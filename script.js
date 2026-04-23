@@ -219,35 +219,26 @@ if (enterBtn) {
 }
 
 const exitMenuBtn = getEl('exitMenuBtn');
+
 if (exitMenuBtn) {
     exitMenuBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        
-        if (bgMusic) fadeOutAudio(bgMusic);
-        
-        localStorage.removeItem('bgMusicTime');
-        localStorage.removeItem('isMusicActive');
 
-        if (messageOverlay && healingMessage) {
-            healingMessage.innerText = "Nightyyyy Babe";
-            if (mainContent) mainContent.classList.add('dream-fade-out');
-            if (particlesContainer) {
-                particlesContainer.style.transition = "opacity 2s ease";
-                particlesContainer.style.opacity = "0";
-            }
+        const overlay = getEl('messageOverlay');
+        const msg = getEl('healingMessage');
 
-            messageOverlay.classList.remove('hidden');
-            setTimeout(() => messageOverlay.classList.add('fade-in'), 50);
+        if (overlay && msg) {
+            msg.innerText = "Nightyyyy Babe";
+            
+            overlay.classList.remove('hidden');
+            void overlay.offsetWidth; 
+            overlay.classList.add('fade-in');
+
+            document.body.classList.add('dream-fade-out');
 
             setTimeout(() => {
-                messageOverlay.classList.replace('fade-in', 'fade-out');
-                setTimeout(() => {
-                    document.body.style.backgroundColor = "var(--bg-bot)";
-                    window.location.href = 'index.html';
-                }, 1500);
-            }, 3000);
-        } else {
-            window.location.href = 'index.html';
+                window.location.href = 'index.html';
+            }, 3500); 
         }
     });
 }
