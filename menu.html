@@ -13,11 +13,23 @@
 </head>
 <body class="menu-page">
 
-    <div class="toggle-container">
-        <input type="checkbox" id="themeCheckbox">
-        <label for="themeCheckbox" class="toggle-label">
-            <div class="toggle-slider"><span class="icon" id="themeIcon">🌙</span></div>
-        </label>
+    <audio id="bgMusic" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="side-controls">
+        <div class="toggle-container">
+            <input type="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="toggle-label">
+                <div class="toggle-slider">
+                    <span class="icon" id="themeIcon">🌙</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="volume-container">
+            <button id="muteBtn" class="volume-btn">🔊</button>
+        </div>
     </div>
 
     <div id="particles"></div>
@@ -50,6 +62,18 @@
                 <h3>乱七八糟</h3>
                 <p>很喜欢收拾整理right？</p>
                 <p>来 收拾这个</p>
+            </div>
+
+            <div class="menu-card" onclick="location.href='memory-match.html'">
+                <div class="card-icon">
+                    <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
+                        <path d="M20 50 Q 35 20 50 50 T 80 50" stroke-dasharray="4 4" />
+                        <path d="M20 50 L 80 50" />
+                    </svg>
+                </div>
+                <h3>脑筋不用急转弯</h3>
+                <p>喜欢用脑就进来</p>
+                <p>看你配不配嘿嘿</p>
             </div>
 
             <div class="menu-card" onclick="location.href='breathe.html'">

@@ -49,12 +49,23 @@
     </style>
 </head>
 <body>
+    <audio id="bgMusic" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
 
-    <div class="toggle-container">
-        <input type="checkbox" id="themeCheckbox">
-        <label for="themeCheckbox" class="toggle-label">
-            <div class="toggle-slider"><span class="icon" id="themeIcon">🌙</span></div>
-        </label>
+    <div class="side-controls">
+        <div class="toggle-container">
+            <input type="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="toggle-label">
+                <div class="toggle-slider">
+                    <span class="icon" id="themeIcon">🌙</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="volume-container">
+            <button id="muteBtn" class="volume-btn">🔊</button>
+        </div>
     </div>
 
     <div id="particles"></div>
@@ -62,8 +73,8 @@
     <canvas id="zenCanvas"></canvas>
 
     <div class="canvas-ui">
-        <p class="canvas-hint">踏出第一步，惊喜就来了</p>
-        <button class="exit-canvas-btn" onclick="location.href='menu.html'">自信点满了</button>
+        <p class="canvas-hint">随心划动，看繁星闪烁</p>
+        <button class="exit-canvas-btn" onclick="location.href='menu.html'">Back to Main Menu</button>
     </div>
 
     <script src="script.js"></script>

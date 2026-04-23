@@ -88,11 +88,23 @@
 </head>
 <body>
 
-    <div class="toggle-container">
-        <input type="checkbox" id="themeCheckbox">
-        <label for="themeCheckbox" class="toggle-label">
-            <div class="toggle-slider"><span class="icon" id="themeIcon">🌙</span></div>
-        </label>
+    <audio id="bgMusic" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="side-controls">
+        <div class="toggle-container">
+            <input type="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="toggle-label">
+                <div class="toggle-slider">
+                    <span class="icon" id="themeIcon">🌙</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="volume-container">
+            <button id="muteBtn" class="volume-btn">🔊</button>
+        </div>
     </div>
 
     <div id="particles"></div>
@@ -104,7 +116,7 @@
     </div>
 
     <div class="ui-layer">
-        <button class="exit-btn" onclick="location.href='menu.html'">回到中心</button>
+        <button class="exit-btn" onclick="location.href='menu.html'">Back to Main Menu</button>
     </div>
 
     <script src="script.js"></script>

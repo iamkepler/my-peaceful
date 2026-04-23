@@ -60,6 +60,38 @@ body {
     z-index: 1000;
 }
 
+.side-controls {
+    position: fixed !important; 
+    top: 40px !important;
+    right: 30px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    z-index: 9999; 
+}
+
+.volume-btn {
+    width: 38px;
+    height: 38px;
+    background: var(--toggle-bg);
+    border: 2px solid var(--toggle-border);
+    border-radius: 50%;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.volume-btn:active {
+    transform: scale(0.9);
+}
+
 #themeCheckbox { display: none; }
 
 .toggle-label {
